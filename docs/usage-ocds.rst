@@ -6,9 +6,13 @@ The `Open Contracting Data Standard (OCDS) <http://standard.open-contracting.org
 Templates
 =========
 
-Spreadsheet templates for OCDS can be downloaded from https://github.com/open-contracting/sample-data/tree/master/flat-template
+A comprehensive spreadsheet template for OCDS can be downloaded from https://github.com/open-contracting/sample-data/tree/master/flat-template - this is generated directly from the OCDS schema with the commands listed in :ref:`ocds-cli-templates` below. [ link to http://flatten-tool.readthedocs.io/en/latest/create-template/ ? ]
 
-These are generated with the commands listed in :ref:`ocds-cli-templates` below.
+There are multiple shapes of spreadsheet that would produce the same valid OCDS data...
+    [ It is possible to custom design CSV or spreadsheet templates that can be used to provide valid OCDS data (Linking to Spreadsheet Designers Guide).  ]
+
+It's also possible to add additional fields..
+
 
 Web interface
 =============
@@ -16,6 +20,7 @@ Web interface
 Flatten-Tool is integrated into the `Open Contracting Data Standard Validator <http://standard.open-contracting.org/validator/>`__, an online tool for validating and converting OCDS files.
 
 This supports XLSX, but currently only supports uploading CSV (and only one CSV file).
+[ clarify this ]
 
 Commandline Usage
 =================
@@ -62,6 +67,8 @@ See ``flatten-tool unflatten --help`` for details of the commandline options.
 Creating spreadsheet templates
 ------------------------------
 
+[ link to http://flatten-tool.readthedocs.io/en/latest/create-template/ ]
+
 Download https://raw.githubusercontent.com/open-contracting/standard/1.0/standard/schema/release-schema.json to the current directory.
 
 .. code-block:: bash
@@ -72,3 +79,10 @@ This will create `template.xlsx` and a `template/` directory of csv files.
 
 See ``flatten-tool create-template --help`` for details of the commandline options.
 
+
+Python Library Usage
+====================
+
+.. code-block:: python
+
+   from flattentool import create_template, flatten, unflatten

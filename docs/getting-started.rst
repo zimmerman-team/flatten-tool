@@ -12,8 +12,8 @@ Installation
     source .ve/bin/activate
     pip install -r requirements_dev.txt
 
-Usage
------
+Commandline Usage
+-----------------
 
 .. code-block:: bash
 
@@ -23,9 +23,16 @@ will print general help information.
 
 .. code-block:: bash
 
-    flatten-tool {create-template,unflatten} -h
+    flatten-tool {create-template,flatten,unflatten} -h
 
 will print help information specific to that subcommand.
+
+Python Library Usage
+--------------------
+
+.. code-block:: python
+
+   from flattentool import create_template, flatten, unflatten
 
 Python Version Support
 ----------------------
