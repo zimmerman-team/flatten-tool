@@ -10,6 +10,12 @@ from warnings import warn
 from flattentool.sheet import Sheet
 import codecs
 
+
+class CustomJsonrefLoader(jsonref.JsonLoader):
+    def get_remote_json(self, uri, **kwargs):
+        return {}
+
+
 def get_property_type_set(property_schema_dict):
     property_type = property_schema_dict.get('type', [])
     if not isinstance(property_type, list):
@@ -89,10 +95,10 @@ class SchemaParser(object):
             if schema_filename.startswith('http'):
                 import requests
                 r = requests.get(schema_filename)
-                self.root_schema_dict = jsonref.loads(r.text, object_pairs_hook=OrderedDict)
+                self.root_schema_dict = jsonref.loads(r.text, object_pairs_hook=OrderedDict, loader=CustomJsonrefLoader())
             else:
                 with codecs.open(schema_filename, encoding="utf-8") as schema_file:
-                    self.root_schema_dict = jsonref.load(schema_file, object_pairs_hook=OrderedDict)
+                    self.root_schema_dict = jsonref.load(schema_file, object_pairs_hook=OrderedDict, loader=CustomJsonrefLoader())
         else:
             self.root_schema_dict = root_schema_dict
 
