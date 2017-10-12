@@ -96,9 +96,12 @@ def test_roundtrip_360_rollup(tmpdir, use_titles):
     assert original_json == roundtripped_json
 
 
+@pytest.mark.parametrize('input_name', [
+    'examples/iati/expected.xml',
+    'flattentool/tests/fixtures/example.xml',
+])
 @pytest.mark.parametrize('output_format', ['xlsx', 'csv'])
-def test_roundtrip_xml(tmpdir, output_format):
-    input_name = 'examples/iati/expected.xml'
+def test_roundtrip_xml(tmpdir, input_name, output_format):
     flatten(
         input_name=input_name,
         output_name=tmpdir.join('flattened').strpath+'.'+output_format,

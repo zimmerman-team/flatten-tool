@@ -17,3 +17,9 @@ WellcomeTrust-grants_fixed_2_grants.json
 Source: http://data.threesixtygiving.org/dataset/welcome-trust-grants-awarded
 (but with the key "Grants" changed to "grants" and truncated to to releases)
 License: Creative Commons Attribution
+
+example.xml
+Source: http://iatistandard.org/202/activity-standard/example-xml/
+Copyright © Development Initiatives, on behalf of the IATI Secretariat
+Released under the Creative Commons attribution license
+http://iatistandard.org/202/license/
