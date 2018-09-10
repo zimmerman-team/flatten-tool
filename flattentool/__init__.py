@@ -110,6 +110,7 @@ def decimal_default(o):
             return NumberStr(o)
     raise TypeError(repr(o) + " is not JSON serializable")
 
+
 def multi_line_children(result, parent_key, child_key):
     t_result = OrderedDict()
     for key, value in result[0].items():
