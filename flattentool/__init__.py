@@ -1,3 +1,4 @@
+from django.conf import settings
 from flattentool.schema import SchemaParser
 from flattentool.json_input import JSONParser
 from flattentool.output import FORMATS as OUTPUT_FORMATS
@@ -109,6 +110,43 @@ def decimal_default(o):
             return NumberStr(o)
     raise TypeError(repr(o) + " is not JSON serializable")
 
+def multi_line_children(result, parent_key, child_key):
+    t_result = OrderedDict()
+    for key, value in result[0].items():
+        t_value = value
+        if key == parent_key:
+            total_budget = list()
+            for item in value:
+                try:
+                    budget_line = item[child_key]
+                    t_budget_line = OrderedDict()
+                    line = None
+                    for c_key, c_value in budget_line[0].items():
+                        if c_key == '#':
+                            line = int(c_value['text()'])
+                        else:
+                            t_budget_line[c_key] = c_value
+                    if line is not None:
+                        try:
+                            total_budget[line][child_key]. \
+                                append(t_budget_line)
+                        except KeyError:
+                            total_budget[line][child_key] = \
+                                [t_budget_line]
+                except KeyError:
+                    total_budget.append(item)
+            t_value = total_budget
+        t_result[key] = t_value
+    return [t_result]
+
+
+def multi_line_budget(result):
+    return multi_line_children(result, 'total-budget', 'budget-line')
+
+
+def multi_line_expenditure(result):
+    return multi_line_children(result, 'total-expenditure', 'expense-line')
+
 
 def unflatten(input_name, base_json=None, input_format=None, output_name=None,
               root_list_path=None, encoding='utf8', timezone_name='UTC',
@@ -211,6 +249,10 @@ def unflatten(input_name, base_json=None, input_format=None, output_name=None,
         )
         cell_source_map_data.update(cell_source_map_data_main or {})
         heading_source_map_data.update(heading_source_map_data_main or {})
+
+        if settings.MULTI_LINE_SUPPORT:
+            result = multi_line_expenditure(multi_line_budget(result))
+
         base[root_list_path] = list(result)
 
     if xml:

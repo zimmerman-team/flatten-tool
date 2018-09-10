@@ -16,3 +16,5 @@ examples/flatten/simple/actual
 examples/flatten/simple/actual.*
 examples/receipt/source-map/actual
 examples/receipt/source-map/actual.*
+.idea
+
