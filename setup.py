@@ -8,16 +8,16 @@ if sys.version < '3':
 
 setup(
     name='flattentool',
-    version='0.2.0',
-    author='Ben Webb',
-    author_email='bjwebb67@googlemail.com',
+    version='0.5.0',
+    author='Open Data Services',
+    author_email='data@opendataservices.coop',
     packages=['flattentool'],
     scripts=['flatten-tool'],
     url='https://github.com/OpenDataServices/flatten-tool',
     license='MIT',
     description='Tools for generating CSV and other flat versions of the structured data',
     install_requires=install_requires,
-    extras_requires = {
+    extras_require = {
         'HTTP': ['requests']
     }
 )

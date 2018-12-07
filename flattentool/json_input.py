@@ -24,6 +24,10 @@ class BadlyFormedJSONError(ValueError):
     pass
 
 
+class BadlyFormedJSONErrorUTF8(BadlyFormedJSONError):
+    pass
+
+
 def sheet_key_field(sheet, key):
     if key not in sheet:
         sheet.append(key)
@@ -35,7 +39,10 @@ def sheet_key_title(sheet, key):
 
     """
     if key in sheet.titles:
-        return sheet.titles[key]
+        title = sheet.titles[key]
+        if title not in sheet:
+            sheet.append(title)
+        return title
     else:
         if key not in sheet:
             sheet.append(key)
@@ -47,17 +54,28 @@ class JSONParser(object):
     # Similarily with methods like parse_json_dict
 
     def __init__(self, json_filename=None, root_json_dict=None, schema_parser=None, root_list_path=None,
-                 root_id='ocid', use_titles=False, xml=False, id_name='id'):
+                 root_id='ocid', use_titles=False, xml=False, id_name='id', filter_field=None, filter_value=None,
+                 remove_empty_schema_columns=False, truncation_length=3):
         self.sub_sheets = {}
         self.main_sheet = Sheet()
         self.root_list_path = root_list_path
         self.root_id = root_id
         self.use_titles = use_titles
+        self.truncation_length = truncation_length
         self.id_name = id_name
         self.xml = xml
+        self.filter_field = filter_field
+        self.filter_value = filter_value
+        self.remove_empty_schema_columns = remove_empty_schema_columns
         if schema_parser:
-            self.main_sheet = schema_parser.main_sheet
-            self.sub_sheets = schema_parser.sub_sheets
+            self.main_sheet = copy.deepcopy(schema_parser.main_sheet)
+            self.sub_sheets = copy.deepcopy(schema_parser.sub_sheets)
+            if remove_empty_schema_columns:
+                # Don't use columns from the schema parser
+                # (avoids empty columns)
+                self.main_sheet.columns = []
+                for sheet_name, sheet in list(self.sub_sheets.items()):
+                    sheet.columns = []
             # Rollup is pulled from the schema_parser, as rollup is only possible if a schema parser is specified
             self.rollup = schema_parser.rollup
             self.schema_parser = schema_parser
@@ -86,6 +104,8 @@ class JSONParser(object):
             with codecs.open(json_filename, encoding='utf-8') as json_file:
                 try:
                     self.root_json_dict = json.load(json_file, object_pairs_hook=OrderedDict, parse_float=Decimal)
+                except UnicodeError as err:
+                    raise BadlyFormedJSONErrorUTF8(*err.args)
                 except ValueError as err:
                     raise BadlyFormedJSONError(*err.args)
         else:
@@ -102,6 +122,12 @@ class JSONParser(object):
                 # fallover on empty activity, e.g. <iati-activity/>
                 continue
             self.parse_json_dict(json_dict, sheet=self.main_sheet)
+
+        if self.remove_empty_schema_columns:
+            # Remove sheets with no lines of data
+            for sheet_name, sheet in list(self.sub_sheets.items()):
+                if not sheet.lines:
+                    del self.sub_sheets[sheet_name]
     
     def parse_json_dict(self, json_dict, sheet, json_key=None, parent_name='', flattened_dict=None, parent_id_fields=None, top_level_of_sub_sheet=False):
         """
@@ -125,6 +151,12 @@ class JSONParser(object):
             top = True
         else:
             top = False
+
+        if parent_name == '' and self.filter_field and self.filter_value:
+            if self.filter_field not in json_dict:
+                return
+            if json_dict[self.filter_field] != self.filter_value:
+                return
 
         if top_level_of_sub_sheet:
             # Only add the IDs for the top level of object in an array
@@ -183,7 +215,7 @@ class JSONParser(object):
                                 if parent_name+key+'/0/'+k in self.schema_parser.main_sheet:
                                     flattened_dict[sheet_key(sheet, parent_name+key+'/0/'+k)] = 'WARNING: More than one value supplied, consult the relevant sub-sheet for the data.'
 
-                    sub_sheet_name = make_sub_sheet_name(parent_name, key) 
+                    sub_sheet_name = make_sub_sheet_name(parent_name, key, truncation_length=self.truncation_length)
                     if sub_sheet_name not in self.sub_sheets:
                         self.sub_sheets[sub_sheet_name] = Sheet(name=sub_sheet_name)
 

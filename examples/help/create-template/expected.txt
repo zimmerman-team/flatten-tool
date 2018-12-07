@@ -1,6 +1,8 @@
 usage: flatten-tool create-template [-h] -s SCHEMA [-f {csv,xlsx,all}]
                                     [-m MAIN_SHEET_NAME] [-o OUTPUT_NAME]
                                     [--rollup] [-r ROOT_ID] [--use-titles]
+                                    [--disable-local-refs]
+                                    [--truncation-length TRUNCATION_LENGTH]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -21,4 +23,8 @@ optional arguments:
                         schema.
   -r ROOT_ID, --root-id ROOT_ID
                         Root ID of the data format, e.g. ocid for OCDS
-  --use-titles          Convert titles. Requires a schema to be specified.
+  --use-titles          Convert titles.
+  --disable-local-refs  Disable local refs when parsing JSON Schema.
+  --truncation-length TRUNCATION_LENGTH
+                        The length of components of sub-sheet names (default
+                        3).
