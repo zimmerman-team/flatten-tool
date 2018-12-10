@@ -1,4 +1,3 @@
-from django.conf import settings
 from flattentool.schema import SchemaParser
 from flattentool.json_input import JSONParser
 from flattentool.output import FORMATS as OUTPUT_FORMATS
@@ -280,7 +279,7 @@ def unflatten(input_name, base_json=None, input_format=None, output_name=None,
         cell_source_map_data.update(cell_source_map_data_main or {})
         heading_source_map_data.update(heading_source_map_data_main or {})
 
-        if settings.MULTI_LINE_SUPPORT:
+        if base_configuration.get('RootListPath') == 'iati-organisation':
             result = multi_line_expenditure(multi_line_budget(result))
 
         if root_is_list:
