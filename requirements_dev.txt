@@ -1,5 +1,5 @@
 -e .[HTTP]
-urllib3==1.23
+urllib3==1.26.5
 pytest
 pytest-cov
 coveralls
